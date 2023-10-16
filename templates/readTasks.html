@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Tasks</title>
+    <link rel="stylesheet" href="/static/readTasks.css"> 
+</head>
+<body>
+    <div class="container">
+        <h1>All Tasks</h1>
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .AllTasks }}
+                <tr>
+                    <td>{{ .Title }}</td>
+                    <td>{{ .Description }}</td>
+                    <td>{{ .DueDate }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+        <div class="button-container">
+            <a href="/deleteTask" class="button">Delete Task</a>
+            <a href="/createTask" class="button">Create Task</a>
+            <a href="/updateTask" class="button">Update Task</a>
+        </div>
+    </div>
+</body>
+</html>

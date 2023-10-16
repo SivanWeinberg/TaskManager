@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Task</title>
+    <link rel="stylesheet" href="/static/readTasks.css">
+</head>
+<body>    
+    <div class="container">
+        <h1>Delete Task</h1>
+        <form id="deleteTaskForm">
+            <label for="titleToDelete">Title to Delete:</label>
+            <input type="text" id="titleToDelete" name="titleToDelete" required><br>
+
+            <button type="submit">Delete Task</button><button type="button" onclick="goBack()">Go Back</button>
+        </form>
+
+        <script>
+            function goBack() {
+                window.location.href = "/readTasks";
+            }
+            document.getElementById("deleteTaskForm").addEventListener("submit", function(event) {
+                event.preventDefault();
+                const titleToDelete = document.getElementById("titleToDelete").value;
+
+                // Create a JSON object with the titleToDelete
+                const requestBody = {
+                    titleToDelete: titleToDelete
+                };
+
+                fetch("/deleteTask", {
+                    method: "DELETE",
+                    body: JSON.stringify(requestBody),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        alert("Task deleted successfully!");
+                        window.location.href = "/readTasks";
+                    } else if (response.status === 404) {
+                        alert("Task not found, try again");
+                    } else {
+                        console.log(response.text());
+                        alert("Failed to delete task, try again");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while deleting the task");
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

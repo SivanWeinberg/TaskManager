@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Task</title>
+    <link rel="stylesheet" href="/static/readTasks.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Update Task</h1>
+        <form id="updateTaskForm">
+            <label for="titleToUpdate">Current Title:</label>
+            <input type="text" id="titleToUpdate" name="titleToUpdate" required><br>
+
+            <label for="newTitle">New Title:</label>
+            <input type="text" id="newTitle" name="newTitle"><br>
+
+            <label for="newDescription">New Description:</label>
+            <input type="text" id="newDescription" name="newDescription"><br>
+
+            <label for="newDay">New Day:</label>
+            <input type="number" id="newDay" name="newDay"><br>
+
+            <label for="newMonth">New Month:</label>
+            <input type="number" id="newMonth" name="newMonth"><br>
+
+            <label for="newYear">New Year:</label>
+            <input type="number" id="newYear" name="newYear"><br>
+
+            <button type="submit">Update Task</button><button type="button" onclick="goBack()">Go Back</button>
+        </form>
+    </div>
+
+    <script>
+        function goBack() {
+           window.location.href = "/readTasks";
+        }
+        document.getElementById("updateTaskForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const currentTitle = formData.get("titleToUpdate");
+            const newTitle = formData.get("newTitle");
+            const newDescription = formData.get("newDescription");
+            const newDay = formData.get("newDay");
+            const newMonth = formData.get("newMonth");
+            const newYear = formData.get("newYear");
+
+            fetch("/updateTask", {
+                method: "PUT",
+                body: JSON.stringify({
+                    CurrentTitle: currentTitle,
+                    NewTitle: newTitle,
+                    NewDescription: newDescription,
+                    NewDay: newDay,
+                    NewMonth: newMonth,
+                    NewYear: newYear
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Task updated successfully!");
+                    window.location.href = "/readTasks"; // Redirect to a new page if needed.
+                } else {
+                    alert("Failed to update task. Please check the input values.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred while trying to update the task.");
+            });
+        });
+    </script>
+</body>
+</html>

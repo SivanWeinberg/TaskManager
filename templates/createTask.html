@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Task</title>
+    <link rel="stylesheet" href="/static/readTasks.css">
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>Create Task</h1>
+        <form action="/createTask" method="POST">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required><br>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" required></textarea><br>
+
+            <label for="day">Day:</label>
+            <input type="number" id="day" name="day" required><br>
+
+            <label for="month">Month:</label>
+            <input type="number" id="month" name="month" required><br>
+
+            <label for="year">Year:</label>
+            <input type="number" id="year" name="year" required><br>
+
+            <button type="submit">Create Task</button><button type="button" onclick="goBack()">Go Back</button>
+
+        </form>
+    </div>
+    <script>
+        function goBack() {
+            window.location.href = "/readTasks";
+        }
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            // Convert the day, month, and year to numbers
+            const jsonData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                day: parseInt(formData.get('day'), 10), // Convert to number
+                month: parseInt(formData.get('month'), 10), // Convert to number
+                year: parseInt(formData.get('year'), 10) // Convert to number
+            };
+
+            fetch('/createTask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    window.location.href = "/readTasks";
+                } else {
+                    alert("Failed to create a new task.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred while creating a new task.");
+            });
+        });
+
+
+    </script>
+    
+    </script>
+</body>
+</html>
