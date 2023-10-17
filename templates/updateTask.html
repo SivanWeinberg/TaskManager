@@ -7,7 +7,7 @@
 <body>
     <div class="container">
         <h1>Update Task</h1>
-        <form id="updateTaskForm">
+        <div id="updateTaskForm">
             <label for="titleToUpdate">Current Title:</label>
             <input type="text" id="titleToUpdate" name="titleToUpdate" required><br>
 
@@ -26,35 +26,36 @@
             <label for="newYear">New Year:</label>
             <input type="number" id="newYear" name="newYear"><br>
 
-            <button type="submit">Update Task</button><button type="button" onclick="goBack()">Go Back</button>
-        </form>
+            <button type="button" onclick="updateTask()">Update Task</button>
+            <button type="button" onclick="goBack()">Go Back</button>
+        </div>
     </div>
 
     <script>
         function goBack() {
-           window.location.href = "/readTasks";
+            window.location.href = "/readTasks";
         }
-        document.getElementById("updateTaskForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const currentTitle = formData.get("titleToUpdate");
-            const newTitle = formData.get("newTitle");
-            const newDescription = formData.get("newDescription");
-            const newDay = formData.get("newDay");
-            const newMonth = formData.get("newMonth");
-            const newYear = formData.get("newYear");
+
+        function updateTask() {
+            const currentTitle = document.getElementById("titleToUpdate").value;
+            const newTitle = document.getElementById("newTitle").value;
+            const newDescription = document.getElementById("newDescription").value;
+            const newDay = document.getElementById("newDay").value;
+            const newMonth = document.getElementById("newMonth").value;
+            const newYear = document.getElementById("newYear").value;
+
+            const updateData = {
+                titleToUpdate: currentTitle,
+                newTitle: newTitle,
+                newDescription: newDescription,
+                newDay: newDay,
+                newMonth: newMonth,
+                newYear: newYear
+            };
 
             fetch("/updateTask", {
                 method: "PUT",
-                body: JSON.stringify({
-                    CurrentTitle: currentTitle,
-                    NewTitle: newTitle,
-                    NewDescription: newDescription,
-                    NewDay: newDay,
-                    NewMonth: newMonth,
-                    NewYear: newYear
-                }),
+                body: JSON.stringify(updateData),
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -71,7 +72,7 @@
                 console.error("Error:", error);
                 alert("An error occurred while trying to update the task.");
             });
-        });
+        }
     </script>
 </body>
 </html>

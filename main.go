@@ -15,9 +15,9 @@ func init() {
 }
 func main() {
 	website := gin.Default()
-	tmpl := template.Must(template.ParseGlob("templates/*.html"))
+	tmpl := template.Must(template.ParseGlob("templates/*.html")) //Getting all the html templates
 	routes.RunRoutes(website, tmpl)
 
-	website.Run(":3000")
+	website.Run(":3000") //Running the server
 
 }

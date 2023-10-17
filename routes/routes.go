@@ -14,12 +14,11 @@ func RunRoutes(website *gin.Engine, tmpl *template.Template) {
 	website.POST("/signup", controllers.SignUp)
 	website.POST("/login", controllers.Login)
 	website.POST("/createTask", middleware.RequiredAuth, controllers.CreateTask)
-	website.GET("/loggedin", middleware.RequiredAuth, controllers.Validate)
-	website.GET("/home", middleware.RequiredAuth, controllers.Home)
 	website.DELETE("/deleteTask", middleware.RequiredAuth, controllers.DeleteTask)
 	website.DELETE("/deleteTask/:title", middleware.RequiredAuth, controllers.DeleteTask)
 	website.PUT("/updateTask", middleware.RequiredAuth, controllers.UpdateTask)
 	website.GET("/readTasks", middleware.RequiredAuth, controllers.ReadAllTasks)
+	website.GET("/logout", controllers.Logout)
 	website.LoadHTMLFiles("templates/index.html", "templates/login.html", "templates/createTask.html", "templates/deleteTask.html", "templates/updateTask.html", "templates/readTasks.html",
 		"templates/unAuthorized.html")
 	website.Static("/static", "static")
