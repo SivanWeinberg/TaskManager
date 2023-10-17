@@ -14,6 +14,7 @@ import (
 )
 
 func CreateTask(c *gin.Context) {
+	//getting task information from the user
 	var taskBody struct {
 		Title       string `json:"title" binding:"required"`
 		Description string `json:"description" binding:"required"`
@@ -29,12 +30,14 @@ func CreateTask(c *gin.Context) {
 		})
 		return
 	}
+	//Getting the user information that was saved in middleware
 	user, _ := c.Get("user")
 	fmt.Println(user)
 	userObj := user.(models.User)
+	//Checking if the date entered is valid
 	dueDate := validateDate(taskBody.Day, taskBody.Month, taskBody.Year, c)
 
-	if dueDate == "" { //if the dueDate is an empty string it means the date is invalid.
+	if dueDate == "" { //If the dueDate is an empty string it means the date is invalid.
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid date.",
 		})
@@ -50,7 +53,7 @@ func CreateTask(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "created the task"}) //if we passed everything until now we want to announce that the task was created
+	c.JSON(http.StatusOK, gin.H{"message": "created the task"}) //If we passed everything until now we want to announce that the task was created
 
 }
 
@@ -58,12 +61,13 @@ func DeleteTask(c *gin.Context) {
 	user, _ := c.Get("user")
 	userObj := user.(models.User)
 	getUserId := userObj.ID
-	if userObj.Role != "User" { // checking if the user got a permission
+	if userObj.Role != "User" { // Checking if the user got a permission
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "you need to log in to get permission",
 		})
 		return
 	}
+	//If the url contains a title it will use it, if not it will ask the user for the title.
 	taskTitle := c.Param("title")
 	if taskTitle == "" {
 		var taskToDelete struct {
@@ -107,24 +111,25 @@ func UpdateTask(c *gin.Context) {
 	user, _ := c.Get("user") //getting the user information
 	userObj := user.(models.User)
 	getUserId := userObj.ID
+	//Information about which task/ what in the task to update
 	var updateFields struct {
-		CurrentTitle   string `form:"titleToUpdate" binding:"required"`
-		NewTitle       string `form:"newTitle"`
-		NewDescription string `form:"newDescription"`
-		NewDay         string `form:"newDay"`
-		NewMonth       string `form:"newMonth"`
-		NewYear        string `form:"newYear"`
+		CurrentTitle   string `json:"titleToUpdate" binding:"required"`
+		NewTitle       string `json:"newTitle"`
+		NewDescription string `json:"newDescription"`
+		NewDay         string `json:"newDay"`
+		NewMonth       string `json:"newMonth"`
+		NewYear        string `json:"newYear"`
 	}
 
-	if err := c.ShouldBind(&updateFields); err != nil {
+	if err := c.ShouldBindJSON(&updateFields); err != nil {
 		log.Printf("Error binding request data: %v", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read title of the task you want to update",
+			"error": "Failed to read JSON data",
 		})
 		return
 	}
 	var task models.Task
-
+	//checking if the task exists
 	result := initializers.DB.Where("user_id = ? AND title = ?", userObj.ID, updateFields.CurrentTitle).First(&task)
 	if result.Error != nil {
 		log.Printf("Title not founds: %v", result.Error)

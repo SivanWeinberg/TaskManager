@@ -3,6 +3,8 @@ package controllers
 import (
 	"auth/initializers"
 	"auth/models"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +16,7 @@ import (
 )
 
 func TestCreateTask(t *testing.T) {
+	//loading database
 	initializers.LoadEnvVariables() //loading environment variables
 	initializers.ConnectToDb()
 	initializers.SyncDatabase()
@@ -31,6 +34,7 @@ func TestCreateTask(t *testing.T) {
 	})
 	router.POST("/createTask", CreateTask)
 
+	//tasks to test on the create function
 	cases := []struct {
 		title, desc            string
 		day, month, year, code int
@@ -41,13 +45,14 @@ func TestCreateTask(t *testing.T) {
 		{"Dance", "Party", -1, 2, 1934, 400},
 	}
 	for _, c := range cases {
+		//json body for the post request.
 		bodyString := `{"title":"` + c.title + `","description":"` + c.desc + `","day":` + strconv.Itoa(c.day) + `,"month":` + strconv.Itoa(c.month) + `,"year":` + strconv.Itoa(c.year) + `}`
 		body := strings.NewReader(bodyString)
-		fmt.Println(body)
 		req, _ := http.NewRequest("POST", "/createTask", body)
 		req.Header.Add("Content-Type", "application/json")
 		resp := httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
+		//if it won't return the correct code the fail will fail
 		if resp.Code != c.code {
 			t.Errorf("Expected status code %d, but got %d", c.code, resp.Code)
 		}
@@ -92,7 +97,7 @@ func TestUpdateTask(t *testing.T) {
 	}
 
 	for _, c := range cases {
-
+		//creating a task to run a test on it
 		task := models.Task{
 			Title:       c.currentTitle,
 			Description: c.currentDesc,
@@ -102,23 +107,32 @@ func TestUpdateTask(t *testing.T) {
 			// Other fields you want to set
 		}
 		initializers.DB.Create(&task)
+		//request body
+		updateData := struct {
+			CurrentTitle   string `json:"titleToUpdate"`
+			NewTitle       string `json:"newTitle"`
+			NewDescription string `json:"newDescription"`
+			NewDay         string `json:"newDay"`
+			NewMonth       string `json:"newMonth"`
+			NewYear        string `json:"newYear"`
+		}{
+			CurrentTitle:   c.titleToUpdate,
+			NewTitle:       c.newTitle,
+			NewDescription: c.newDescription,
+			NewDay:         c.newDay,
+			NewMonth:       c.newMonth,
+			NewYear:        c.newYear,
+		}
+		// Marshal the struct into a JSON string
+		body, _ := json.Marshal(updateData)
 
-		bodyString := `{
-            "CurrentTitle":"` + c.titleToUpdate + `",
-            "newTitle":"` + c.newTitle + `",
-            "newDescription":"` + c.newDescription + `",
-            "newDay":"` + c.newDay + `",
-            "newMonth":"` + c.newMonth + `",
-            "newYear":"` + c.newYear + `"
-        }`
-		body := strings.NewReader(bodyString)
-
-		req, _ := http.NewRequest("PUT", "/updateTask", body)
+		// Create the request with the JSON body
+		req, _ := http.NewRequest("PUT", "/updateTask", bytes.NewReader(body))
 		req.Header.Add("Content-Type", "application/json")
 		resp := httptest.NewRecorder()
-		router.ServeHTTP(resp, req)
+		router.ServeHTTP(resp, req) // making the request and getting the respond to resp
 		initializers.DB.Unscoped().Where("user_id = ?", 0).Delete(&models.Task{})
-
+		//if we didn't recieve the expected code the test will fail
 		if resp.Code != c.code {
 			t.Errorf("Expected status code %d, but got %d", c.code, resp.Code)
 		}
@@ -174,6 +188,7 @@ func TestDeleteTask(t *testing.T) {
 		req.Header.Add("Content-Type", "application/json")
 		resp := httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
+		//if it didn't delete the task we created we want to delete it from the database
 		if resp.Code != 200 {
 			initializers.DB.Unscoped().Where("title = ? AND user_id = ?", c.currentTitle, c.userId).Delete(&models.Task{})
 

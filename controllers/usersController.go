@@ -16,16 +16,18 @@ import (
 func SignUp(c *gin.Context) {
 	//getting the sign up information
 	var body struct {
-		Name     string `form:"name" binding:"required"`
-		Password string `form:"password" binding:"required"`
+		Name     string `json:"name" binding:"required"`
+		Password string `json:"password" binding:"required"`
 	}
-	if err := c.ShouldBind(&body); err != nil {
+
+	if err := c.ShouldBindJSON(&body); err != nil {
 		log.Printf("Error binding request data: %v", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
 		return
 	}
+
 	//hashing the password
 	hashedPassowrd, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 	if err != nil {
@@ -61,6 +63,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	var user models.User
+	//Looking for the user with the entered name
 	initializers.DB.Where("name = ?", body.Name).First(&user)
 	if user.ID == 0 {
 		log.Printf("Error finding the user")
@@ -104,37 +107,16 @@ func Login(c *gin.Context) {
 	})
 }
 
-func Validate(c *gin.Context) {
-	user, exist := c.Get("user")
-	if !exist {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Couldn't find user",
-		})
-		return
-	}
+func Logout(c *gin.Context) {
+	// Clear the authentication token by setting an expired cookie.
+	c.SetCookie("Auth", "", -1, "", "", false, true)
+
+	// Redirect to the login page.
+	c.Redirect(http.StatusSeeOther, "/login")
+
+	// Send a JSON response
 	c.JSON(http.StatusOK, gin.H{
-		"message": user,
+		"message": "Logged out successfully",
 	})
-
-}
-
-func Home(c *gin.Context) {
-	user, exist := c.Get("user")
-	if !exist {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Couldn't find user",
-		})
-		return
-	}
-	userObj, _ := user.(models.User)
-	if userObj.Role != "User" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "you need to log in to get permission",
-		})
-		return
-	}
-
-	// If authorization is successful, proceed with the protected action
-	c.JSON(http.StatusOK, gin.H{"message Access granted": user})
 
 }
