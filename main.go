@@ -1,8 +1,8 @@
 package main
 
 import (
-	"auth/initializers"
-	"auth/routes"
+	"authentication/initializers"
+	"authentication/routes"
 	"html/template"
 
 	"github.com/gin-gonic/gin"

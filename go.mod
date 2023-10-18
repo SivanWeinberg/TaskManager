@@ -1,4 +1,4 @@
-module auth
+module authentication
 
 go 1.21.0
 

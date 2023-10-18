@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"auth/initializers"
-	"auth/models"
+	"authentication/initializers"
+	"authentication/models"
 	"fmt"
 	"net/http"
 	"os"

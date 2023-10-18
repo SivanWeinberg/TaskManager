@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"auth/initializers"
-	"auth/models"
+	"authentication/initializers"
+	"authentication/models"
 	"bytes"
 	"encoding/json"
 	"fmt"

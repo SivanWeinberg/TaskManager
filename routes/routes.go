@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"auth/controllers"
-	"auth/middleware"
+	"authentication/controllers"
+	"authentication/middleware"
 	"fmt"
 	"html/template"
 	"net/http"
