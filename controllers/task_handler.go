@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"autentication/models"
 	"authentication/initializers"
+	"authentication/models"
 	"fmt"
 	"log"
 	"net/http"
