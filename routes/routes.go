@@ -11,7 +11,7 @@ import (
 )
 
 func RunRoutes(website *gin.Engine, tmpl *template.Template) {
-	website.POST("/signup", controllers.SignUp)
+	website.POST("/", controllers.SignUp)
 	website.POST("/login", controllers.Login)
 	website.POST("/createTask", middleware.RequiredAuth, controllers.CreateTask)
 	website.DELETE("/deleteTask", middleware.RequiredAuth, controllers.DeleteTask)
@@ -24,7 +24,7 @@ func RunRoutes(website *gin.Engine, tmpl *template.Template) {
 	website.Static("/static", "static")
 
 	// Define a route to render the signup form
-	website.GET("/signup", func(c *gin.Context) {
+	website.GET("/", func(c *gin.Context) {
 		renderTemplate(c, tmpl, "index.html", nil)
 	})
 	website.GET("/login", func(c *gin.Context) {
